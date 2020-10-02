@@ -2,3 +2,5 @@ venv
 .vscode
 conf/
 *cred
+.cache*
+.env

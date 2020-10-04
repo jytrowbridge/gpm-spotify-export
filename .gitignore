@@ -4,3 +4,5 @@ conf/
 *cred
 .cache*
 .env
+__pycache__
+log*

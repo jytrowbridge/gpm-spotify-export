@@ -11,9 +11,10 @@ def pull_playlists(mobile_client):
                 song = {
                     'title': track['track']['title'],
                     'album': track['track']['album'],
-                    'artist': track['track']['albumArtist']
+                    'artist': track['track']['artist'],
+                    'album_artist': track['track']['albumArtist']
                 }
-            playlist['tracks'].append(song)
+                playlist['tracks'].append(song)
         playlists_arr.append(playlist)
     return playlists_arr
 
@@ -25,7 +26,8 @@ def pull_saved_songs(mobile_client):
         song = {
             'title': gpm_song['title'],
             'album': gpm_song['album'],
-            'artist': gpm_song['artist']
+            'artist': gpm_song['artist'],
+            'album_artist': gpm_song['albumArtist']
         }
         songs_arr.append(song)
     return songs_arr
@@ -42,4 +44,5 @@ if __name__ == "__main__":
 
     # print(pull_playlists(mc))
 
-    print(len(pull_saved_songs(mc)))
+    # print(len(pull_saved_songs(mc)))
+    songs = pull_playlists(mc)

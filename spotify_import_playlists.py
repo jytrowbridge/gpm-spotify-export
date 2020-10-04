@@ -1,55 +1,34 @@
-from gmusicapi import Mobileclient
-import json
-from spotipy.oauth2 import SpotifyClientCredentials
-import spotipy
-import spotipy.util as util
 from dotenv import load_dotenv
+import json
 import os
 import re
+
+from gmusicapi import Mobileclient
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy.util as util
 from gpm_test import pull_playlists
 
 load_dotenv()
 CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+USERNAME = os.getenv('SPOTIFY_USERNAME') 
 
 scope = "playlist-modify-private playlist-modify-public user-library-modify"
-username = "1247468717"
 redirect_uri = "http://localhost:8888/callback/"
 
-token = util.prompt_for_user_token(username, scope, CLIENT_ID, CLIENT_SECRET, redirect_uri)
+token = util.prompt_for_user_token(USERNAME,
+                                   scope,
+                                   CLIENT_ID,
+                                   CLIENT_SECRET,
+                                   redirect_uri
+                                   )
+
 sp = spotipy.Spotify(auth=token,
                      client_credentials_manager=SpotifyClientCredentials(
-                        client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+                        client_id=CLIENT_ID, client_secret=CLIENT_SECRET
+                        )
                      )
-
-# sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
-
-print(sp.user_playlist_create(username, 'Test SPOTIPY playlist 3'))
-
-
-# name = 'chopped in half'
-# artist = 'obituary'
-
-# results = sp.search(q=f'track:{ name} artist:{artist}', type='track', limit=1)
-# print(json.dumps(results, indent=2))
-# print(results['tracks']['items'][0]['album']['id'])
-
-#current_user_saved_tracks_add(
-# sp.current_user_saved_albums_add(['79fVRZLnIqS3FytTLfTBT4'])
-'''
-
-FEATURES TO ADD
-    - playlist export
-        - mass search... might time out
-        - create doc of missing files
-    - saved album wipe
-        - for me only
-        - delete every album saved on spotify
-    - save all albums from songs I have in library on gpm
-        - almost all songs I have are part of saved albums
-    - (alternative) save songs as 'liked' on spotify
-        - I don't want this but some people might
-'''
 
 
 def import_playlist(playlist_data, username, spotify_object):
@@ -83,7 +62,11 @@ def import_playlist(playlist_data, username, spotify_object):
             iters += 1
             track_title = track_title.replace("'", "")
             query = f'track:{track_title} artist:{artist}'
-            spotify_results = spotify_object.search(query, type='track', limit=1)
+            spotify_results = spotify_object.search(query,
+                                                    type='track',
+                                                    limit=1
+                                                    )
+
             if len(spotify_results['tracks']['items']) > 0:
                 sp_track = spotify_results['tracks']['items'][0]
                 if iters > 1:
@@ -106,15 +89,3 @@ def import_playlist(playlist_data, username, spotify_object):
     return log_file_arr
     # playlist = spotify_object.user_playlist_create(username, name)
     # spotify_object.user_playlist_add_tracks(user=username, playlist_id=playlist['id'], tracks=spotify_song_ids)
-
-
-if __name__ == "__main__":
-
-    mc = Mobileclient()
-    mc.oauth_login('3b98457227009a89', oauth_credentials='./mobilecredentials.cred')
-    playlists = pull_playlists(mc)
-    log_file_arr = []
-    for playlist in playlists:
-        log_file_arr += import_playlist(playlist, username, sp)
-    with open('log_file_2.txt', 'w') as f:
-        f.write('\n'.join(log_file_arr))

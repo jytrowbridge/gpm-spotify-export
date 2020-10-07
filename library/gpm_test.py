@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
     mc = Mobileclient()
     # oauth_creds = mc.perform_oauth('./mobilecredentials.cred')
-    # oauth_creds = mc.perform_oauth(open_browser=True)
+    oauth_creds = mc.perform_oauth(open_browser=True)
 
-    mc.oauth_login('3b98457227009a89', oauth_credentials='./mobilecredentials.cred')
+    mc.oauth_login('3b98457227009a89', oauth_credentials=oauth_creds)
     # mc.oauth_login(mc.FROM_MAC_ADDRESS, oauth_credentials=oauth_creds)
 
     # print(pull_playlists(mc))

@@ -11,7 +11,7 @@ load_dotenv()
 CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 USERNAME = os.getenv('SPOTIFY_USERNAME')
-scope = "playlist-modify-private playlist-modify-public user-library-modify"
+scope = "playlist-modify-private playlist-modify-public user-library-modify user-library-read"
 redirect_uri = "http://localhost:8888/callback/"
 
 token = util.prompt_for_user_token(USERNAME,

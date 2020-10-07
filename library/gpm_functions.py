@@ -57,6 +57,20 @@ def pull_saved_songs(mobile_client):
     return songs_arr
 
 
+def pull_saved_albums_thru_songs(mobile_client):
+    gpm_songs = mobile_client.get_all_songs()
+    albums_arr = []
+    for gpm_song in gpm_songs:
+        album = {
+            'name': gpm_song['album'],
+            'artist': gpm_song['albumArtist']
+        }
+        if album not in albums_arr:
+            albums_arr.append(album)
+    return albums_arr
+
+
+
 if __name__ == "__main__":
     import sys
     [sys.path.append(i) for i in ['.', '..']]

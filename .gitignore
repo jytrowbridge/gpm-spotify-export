@@ -6,3 +6,5 @@ conf/
 .env
 __pycache__
 log*
+*pyc
+*log

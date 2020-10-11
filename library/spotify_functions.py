@@ -48,11 +48,15 @@ def get_track_id(track, spotify_object, print_log):
             return False
 
 
+def clean_query(query):
+    return re.sub("\s?\(.*\)|'", '', query).lower()
+
+
 def get_album_ids(album_data, spotify_object):
     album_ids = []
     for album in album_data:
-        album_name = album['name'].replace("'", "")
-        artist = album['artist'].replace("'", "")
+        album_name = clean_query(album['name'])
+        artist = clean_query(album['artist'])
         query = f'album:{album_name} artist:{artist}'
         search_results = spotify_object.search(query,
                                                type='album',
@@ -65,10 +69,20 @@ def get_album_ids(album_data, spotify_object):
 
 
 def save_albums(album_ids, spotify_object):
-    spotify_object.current_user_saved_albums_add(album_ids)
+    offset = 0
+    size = 50
+    while True:
+        start = offset
+        end = start + size
+        albums_chunk = album_ids[start:end]
+        spotify_object.current_user_saved_albums_add(albums_chunk)
+        if len(albums_chunk) < size:
+            break
+        else:
+            offset += size
 
 
-def get_all_saved_album_ids(username, spotify_object):
+def get_all_saved_album_ids(spotify_object):
     """Return list of album ids for all saved albums for given username."""
     album_ids = []
     offset = 0
@@ -87,10 +101,36 @@ def get_all_saved_album_ids(username, spotify_object):
 
 def remove_all_saved_albums(spotify_object):
     album_ids = get_all_saved_album_ids(spotify_object)
-    spotify_object.current_user_saved_albums_delete(album_ids)
+    offset = 0
+    size = 50
+    while True:
+        start = offset
+        end = start + size
+        albums_chunk = album_ids[start:end]
+        spotify_object.current_user_saved_albums_delete(albums_chunk)
+        if len(albums_chunk) < size:
+            break
+        else:
+            offset += size
 
 
-def import_playlist(playlist_data, username, spotify_object, print_log=True):
+def get_all_playlists(spotify_object):
+    all_playlists = {}
+    offset = 0
+    limit = 50
+    while True:
+        playlists = spotify_object.current_user_playlists(
+            limit=50, offset=offset)
+        for playlist in playlists['items']:
+            all_playlists[playlist['name']] = True
+        if playlists['next']:
+            offset += limit
+        else:
+            break
+    return all_playlists
+
+
+def import_playlist(playlist_data, username, spotify_object, print_log=True, extant_playlists={}):
     """Import playlist from given playlist object.
     Parameters:
         playlist_data, dictionary with keys:
@@ -136,4 +176,4 @@ if __name__ == "__main__":
 
     from library.spotipy_object import USERNAME, spotipy_object as sp
 
-    print(get_all_saved_album_ids(USERNAME, sp))
+    print(get_all_saved_album_ids(sp))

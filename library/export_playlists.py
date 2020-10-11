@@ -4,7 +4,7 @@ import sys
 from library.gpm_mobileclient import gpm_mobileclient as mc
 from library.spotipy_object import USERNAME, spotipy_object as sp
 from library.gpm_functions import pull_playlists, pull_liked_songs
-from library.spotify_functions import import_playlist
+from library.spotify_functions import import_playlist, get_all_playlists
 
 
 def import_all_playlists():
@@ -19,8 +19,10 @@ def import_all_playlists():
     all_playlists = gpm_playlists + [liked_songs_playlist] 
 
     print("Importing playlists into spotify...")
+    extant_playlists = get_all_playlists(sp)
     for playlist in all_playlists:
-        import_playlist(playlist, USERNAME, sp)
+        if playlist['tracks'] and playlist['name'] not in extant_playlists:
+            import_playlist(playlist, USERNAME, sp)
 
 
 if __name__ == "__main__":
